@@ -1,0 +1,93 @@
+<template name="detailBody">
+  <view class="page page-with-footer" wx:if="{{app}}">
+    <view class="card">
+      <view class="between">
+        <text class="hospital-name">{{app.hospitalName}}</text>
+        <text class="status {{app.statusClass}}">{{app.statusText}}</text>
+      </view>
+      <view class="form-title">{{app.formTitle}}</view>
+      <view class="muted meta">{{app.serialNo}} · {{app.sourceLabel}}</view>
+    </view>
+
+    <view class="card">
+      <view class="section-title">申请科室填写</view>
+      <view class="kv"><text class="k">申请科室</text><text class="v">{{app.department}}</text></view>
+      <view class="kv"><text class="k">申请人</text><text class="v">{{app.applicantName}}</text></view>
+      <view class="kv"><text class="k">申请时间</text><text class="v">{{app.dateText}}</text></view>
+      <view class="kv"><text class="k">用途</text><text class="v">{{app.usage}}</text></view>
+      <view class="kv"><text class="k">经费来源</text><text class="v">{{app.fundNote || '—'}}</text></view>
+      <view class="kv"><text class="k">申请理由</text><text class="v">{{app.reason}}</text></view>
+      <view class="kv"><text class="k">预估总金额</text><text class="v money">¥{{app.amountText}}</text></view>
+      <view class="muted" wx:if="{{app.printedEstimate}}">表头写法 {{app.printedEstimate}}，金额以明细合计为准。</view>
+    </view>
+
+    <view class="card">
+      <view class="section-title">按经销商汇总</view>
+      <view class="tr th">
+        <text class="c1">经销商</text>
+        <text class="c2">项数</text>
+        <text class="c3">小计（元）</text>
+      </view>
+      <view class="tr" wx:for="{{app.groups}}" wx:key="dealerName">
+        <text class="c1">{{item.dealerShortName}} {{item.dealerName}}</text>
+        <text class="c2">{{item.count}}</text>
+        <text class="c3">{{item.subtotalText}}</text>
+      </view>
+      <view class="tr">
+        <text class="c1">合计</text>
+        <text class="c2">{{app.itemCount}}</text>
+        <text class="c3 money">{{app.amountText}}</text>
+      </view>
+    </view>
+
+    <view class="section-title">采购明细</view>
+    <view class="card" wx:for="{{app.groups}}" wx:key="dealerName">
+      <view class="group-head">
+        <view class="dealer-kicker">供货单位 / 经销商</view>
+        <view class="dealer-name">{{item.dealerName}}</view>
+        <view class="between">
+          <text class="dealer-pill">{{item.dealerShortName}}</text>
+          <text class="money">小计 ¥{{item.subtotalText}}</text>
+        </view>
+      </view>
+      <view class="line" wx:for="{{item.lines}}" wx:for-item="line" wx:key="id">
+        <view class="kv"><text class="k">序号</text><text class="v">{{line.sheetNo}}</text></view>
+        <view class="kv"><text class="k">产品名称</text><text class="v">{{line.productName}}</text></view>
+        <view class="kv"><text class="k">规格型号</text><text class="v">{{line.spec}}</text></view>
+        <view class="kv"><text class="k">用途</text><text class="v">{{line.usage}}</text></view>
+        <view class="kv"><text class="k">采购量</text><text class="v">{{line.quantityText}}</text></view>
+        <view class="kv"><text class="k">建议购入价</text><text class="v">¥{{line.unitPriceText}}</text></view>
+        <view class="kv"><text class="k">总价（元）</text><text class="v money">{{line.totalPriceText}}</text></view>
+        <view class="kv"><text class="k">生产单位</text><text class="v">{{line.manufacturer}}</text></view>
+        <view class="kv"><text class="k">经销商</text><text class="v dealer-em">{{line.dealerName}}</text></view>
+        <view class="kv"><text class="k">联系电话</text><text class="v">{{line.phoneText}}</text></view>
+      </view>
+    </view>
+
+    <view class="card" wx:if="{{app.decision}}">
+      <view class="section-title">导师意见</view>
+      <view class="kv"><text class="k">结果</text><text class="v">{{app.decisionText}}</text></view>
+      <view class="kv"><text class="k">审批人</text><text class="v">{{app.decision.reviewerName}}</text></view>
+      <view class="kv"><text class="k">时间</text><text class="v">{{app.decision.time}}</text></view>
+      <view class="kv"><text class="k">意见</text><text class="v">{{app.decision.comment || '—'}}</text></view>
+    </view>
+
+    <view class="card" wx:if="{{showSavedInvoice}}">
+      <view class="section-title">发票与报销备注</view>
+      <block wx:if="{{app.hasInvoice}}">
+        <view class="reason" wx:if="{{app.invoiceNote}}">{{app.invoiceNote}}</view>
+        <view class="muted" wx:for="{{app.invoiceFiles}}" wx:key="name">附件 {{item.name}} · {{item.sizeText}}</view>
+      </block>
+      <view wx:else class="muted">{{app.invoiceEmptyText}}</view>
+    </view>
+
+    <view class="card">
+      <view class="section-title">后续纸质环节</view>
+      <view class="muted">小程序目前只做到导师审批。下面几栏与纸质《临时采购医用耗材购置申请表》一致，仍在纸质单上签字。</view>
+      <view class="flow-row" wx:for="{{app.paperFlow}}" wx:key="step">
+        <view class="{{item.done ? 'flow-done' : ''}}">{{item.step}} · {{item.place}}</view>
+        <view class="muted">{{item.hint}}</view>
+      </view>
+    </view>
+  </view>
+</template>

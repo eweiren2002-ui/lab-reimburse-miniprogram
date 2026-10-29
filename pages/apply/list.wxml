@@ -1,0 +1,9 @@
+<import src="/templates/lists.wxml" />
+<block wx:if="{{blocked}}">
+  <view class="page">
+    <view class="card">当前身份不能查看这份列表。</view>
+  </view>
+</block>
+<block wx:else>
+  <template is="applicationList" data="{{vm: vm, keyword: keyword, searchBox: searchBox}}" />
+</block>

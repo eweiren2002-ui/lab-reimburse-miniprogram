@@ -1,0 +1,77 @@
+<import src="/templates/lists.wxml" />
+<view class="page">
+  <view class="card">
+    <view class="hospital-name">{{hospitalName}}</view>
+    <view class="form-title">{{departmentName}}</view>
+    <view class="form-title">{{formTitle}}</view>
+    <view class="muted" style="margin-top: 12rpx;">{{driverText}} · 不连接医院 HIS / 财务系统</view>
+  </view>
+
+  <view class="role-card" wx:if="{{user}}">
+    <view class="muted">当前身份</view>
+    <view class="hospital-name">{{user.roleLabel}}</view>
+    <view>{{user.name}} · {{user.department}}</view>
+    <view class="role-actions">
+      <button class="btn" bindtap="onSwitchRole">{{user.role === 'mentor' ? '切换为学生/申请人' : '切换为导师'}}</button>
+      <button class="btn" bindtap="onLogin">微信登录</button>
+    </view>
+  </view>
+
+  <view class="stats" wx:if="{{user}}">
+    <navigator class="stat" url="{{user.role === 'mentor' ? '/pages/approve/list?status=pending' : '/pages/apply/list?status=pending'}}">
+      <view class="stat-num">{{counts.pending}}</view>
+      <view class="stat-label">待审批</view>
+    </navigator>
+    <navigator class="stat" url="{{user.role === 'mentor' ? '/pages/approve/list?status=approved' : '/pages/apply/list?status=approved'}}">
+      <view class="stat-num">{{counts.approved}}</view>
+      <view class="stat-label">已通过</view>
+    </navigator>
+    <navigator class="stat" url="{{user.role === 'mentor' ? '/pages/approve/list?status=draft' : '/pages/apply/list?status=draft'}}">
+      <view class="stat-num">{{counts.draft}}</view>
+      <view class="stat-label">草稿</view>
+    </navigator>
+    <navigator class="stat" url="{{user.role === 'mentor' ? '/pages/approve/list?status=rejected' : '/pages/apply/list?status=rejected'}}">
+      <view class="stat-num">{{counts.rejected}}</view>
+      <view class="stat-label">已驳回</view>
+    </navigator>
+  </view>
+  <view class="pending-amount muted" wx:if="{{user}}">待审批金额 ¥{{pendingAmountText}}</view>
+
+  <view class="home-actions" wx:if="{{user && user.role === 'applicant'}}">
+    <navigator class="entry" url="/pages/apply/edit">
+      <view class="entry-title">新建采购申请</view>
+      <view class="entry-desc">多行明细，每一行选择或填写经销商</view>
+    </navigator>
+    <navigator class="entry" url="/pages/apply/list">
+      <view class="entry-title">我的申请</view>
+      <view class="entry-desc">查看进度，补录发票号码或附件说明</view>
+    </navigator>
+  </view>
+
+  <view class="home-actions" wx:if="{{user && user.role === 'mentor'}}">
+    <navigator class="entry" url="/pages/approve/list">
+      <view class="entry-title">待我审批</view>
+      <view class="entry-desc">看完整明细后通过或驳回</view>
+    </navigator>
+    <navigator class="entry" url="/pages/approve/list?view=dealer">
+      <view class="entry-title">按经销商看明细</view>
+      <view class="entry-desc">美谷、晋山、维通利华、和元、森贝伽、德思特</view>
+    </navigator>
+    <navigator class="entry" url="/pages/apply/list">
+      <view class="entry-title">查阅全部申请</view>
+      <view class="entry-desc">只读查看，审批仍在待审批里操作</view>
+    </navigator>
+  </view>
+
+  <view class="section-title" wx:if="{{recent.length}}">最近申请</view>
+  <block wx:for="{{recent}}" wx:key="id">
+    <template is="appCard" data="{{...item}}" />
+  </block>
+
+  <view class="card">
+    <view class="section-title">演示说明</view>
+    <view class="reason">样例来自中心实验室两张临时采购医用耗材购置申请表，申请人俞坤强。9月11日那张已预置为导师通过，方便补录发票；10月9日那张仍是待审批。纸质表上的签名栏原来是空的。</view>
+    <view class="muted">经销商按审批表的供货单位录入。森贝伽也可搜「生航」，德思特对应乐美天产品。</view>
+    <button class="btn" style="margin-top: 20rpx;" bindtap="onReset">恢复演示数据</button>
+  </view>
+</view>
