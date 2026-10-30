@@ -1,0 +1,153 @@
+<view wx:if="{{!ready}}" class="page"><view class="muted pad">加载中…</view></view>
+<block wx:else>
+  <view class="page page-with-footer">
+    <view class="card">
+      <view class="section-title">申请表头</view>
+      <view class="muted">丽水市第二人民医院 · 临时采购医用耗材购置申请表。演示账号默认申请人俞坤强，姓名可改，单据仍归在当前账号下。</view>
+      <view class="field">
+        <view class="field-label">申请科室</view>
+        <input class="field-input" value="{{form.department}}" data-field="department" bindinput="onHeaderInput" />
+      </view>
+      <view class="field">
+        <view class="field-label">申请人</view>
+        <input class="field-input" value="{{form.applicantName}}" data-field="applicantName" bindinput="onHeaderInput" />
+      </view>
+      <view class="field">
+        <view class="field-label">申请时间</view>
+        <picker mode="date" value="{{form.applyDate}}" bindchange="onDateChange">
+          <view class="picker-value">{{dateText}}</view>
+        </picker>
+      </view>
+      <view class="field">
+        <view class="field-label">用途</view>
+        <input class="field-input" value="{{form.usage}}" data-field="usage" bindinput="onHeaderInput" />
+      </view>
+      <view class="field">
+        <view class="field-label">经费来源备注</view>
+        <input class="field-input" value="{{form.fundNote}}" data-field="fundNote" placeholder="例如：浙江省医坛新秀培养经费" bindinput="onHeaderInput" />
+      </view>
+      <view class="field">
+        <view class="field-label">申请理由</view>
+        <textarea class="field-area" value="{{form.reason}}" data-field="reason" maxlength="800" cursor-spacing="120" placeholder="请写明经费项目和大致金额" bindinput="onHeaderInput" />
+      </view>
+    </view>
+
+    <view class="between" style="margin-bottom: 12rpx;">
+      <view class="section-title" style="margin-bottom: 0;">采购明细</view>
+      <text class="tool" bindtap="onAddFromCatalog">从采购目录添加</text>
+    </view>
+
+    <view class="card line-card" wx:for="{{form.items}}" wx:key="id">
+      <view class="line-no">第 {{index + 1}} 行</view>
+      <view class="dealer-banner {{item.dealerName ? '' : 'is-empty'}}" data-index="{{index}}" bindtap="onOpenDealer">
+        <view class="dealer-kicker">供货单位 / 经销商</view>
+        <view class="dealer-name">{{item.dealerName || '点击选择或填写经销商'}}</view>
+        <view class="dealer-pill" wx:if="{{item.dealerShortName}}">{{item.dealerShortName}}</view>
+      </view>
+      <view class="field">
+        <view class="field-label">产品名称</view>
+        <input class="field-input" value="{{item.productName}}" data-index="{{index}}" data-field="productName" bindinput="onLineInput" />
+      </view>
+      <view class="field">
+        <view class="field-label">规格型号</view>
+        <input class="field-input" value="{{item.spec}}" data-index="{{index}}" data-field="spec" bindinput="onLineInput" />
+      </view>
+      <view class="field">
+        <view class="field-label">用途</view>
+        <input class="field-input" value="{{item.usage}}" data-index="{{index}}" data-field="usage" bindinput="onLineInput" />
+      </view>
+      <view class="field">
+        <view class="field-label">采购量</view>
+        <input class="field-input" type="digit" value="{{item.quantity}}" data-index="{{index}}" data-field="quantity" bindinput="onLineInput" />
+      </view>
+      <view class="field">
+        <view class="field-label">科室建议购入价</view>
+        <input class="field-input" type="digit" value="{{item.unitPrice}}" data-index="{{index}}" data-field="unitPrice" bindinput="onLineInput" />
+      </view>
+      <view class="kv"><text class="k">总价（元）</text><text class="v money">{{item.totalPriceText}}</text></view>
+      <view class="field">
+        <view class="field-label">生产单位</view>
+        <input class="field-input" value="{{item.manufacturer}}" data-index="{{index}}" data-field="manufacturer" bindinput="onLineInput" />
+      </view>
+      <view class="field">
+        <view class="field-label">联系电话</view>
+        <input class="field-input" value="{{item.phone}}" data-index="{{index}}" data-field="phone" placeholder="选填，对应表上的销售员电话" bindinput="onLineInput" />
+      </view>
+      <view class="line-tools">
+        <text class="tool" data-index="{{index}}" bindtap="onFillLineFromCatalog">引用目录</text>
+        <text class="tool" data-index="{{index}}" bindtap="onCopyLine">复制此行</text>
+        <text class="tool" data-index="{{index}}" data-dir="-1" bindtap="onMoveLine">上移</text>
+        <text class="tool" data-index="{{index}}" data-dir="1" bindtap="onMoveLine">下移</text>
+        <text class="tool warn" data-index="{{index}}" bindtap="onRemoveLine">删除</text>
+      </view>
+    </view>
+
+    <button class="btn btn-block" bindtap="onAddLine">添加空白明细</button>
+
+    <view class="card" wx:if="{{previewGroups.length}}">
+      <view class="section-title">按经销商合计</view>
+      <view class="tr th">
+        <text class="c1">经销商</text>
+        <text class="c2">项数</text>
+        <text class="c3">小计（元）</text>
+      </view>
+      <view class="tr" wx:for="{{previewGroups}}" wx:key="dealerName">
+        <text class="c1">{{item.dealerShortName}} {{item.dealerName}}</text>
+        <text class="c2">{{item.count}}</text>
+        <text class="c3">{{item.subtotalText}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="footer-bar">
+    <view class="footer-sum">合计 ¥{{amountText}}</view>
+    <button class="btn" disabled="{{busy}}" bindtap="onSaveDraft">存草稿</button>
+    <button class="btn btn-primary" disabled="{{busy}}" bindtap="onSubmit">提交审批</button>
+  </view>
+
+  <view class="mask" wx:if="{{dealerSheet.open}}" bindtap="closeDealer" catchtouchmove="noop">
+    <view class="sheet" catchtap="noop">
+      <view class="sheet-title">选择供货单位 / 经销商</view>
+      <input class="field-input" placeholder="搜索美谷、晋山、生航、德思特…" bindinput="onDealerKeyword" />
+      <scroll-view scroll-y class="sheet-body">
+        <view class="pick-item" wx:for="{{dealerSheet.results}}" wx:key="id" data-id="{{item.id}}" bindtap="onChooseDealer">
+          <view class="dealer-pill">{{item.shortName}}</view>
+          <view>{{item.name}}</view>
+          <view class="muted" wx:if="{{item.note}}">{{item.note}}</view>
+        </view>
+      </scroll-view>
+      <view class="field" style="margin-top: 12rpx;">
+        <view class="field-label">列表里没有时，手工填写全称</view>
+        <input class="field-input" placeholder="供货单位全称" bindinput="onManualDealer" />
+      </view>
+      <button class="btn btn-primary btn-block" bindtap="onConfirmManualDealer">使用该供货单位</button>
+    </view>
+  </view>
+
+  <view class="mask" wx:if="{{catalogSheet.open}}" bindtap="closeCatalog" catchtouchmove="noop">
+    <view class="sheet" catchtap="noop">
+      <view class="sheet-title">采购目录</view>
+      <view class="muted">目录来自两张已录入的审批明细，选中后仍可修改数量和价格。</view>
+      <input class="field-input" placeholder="搜产品、生产单位、经销商" bindinput="onCatalogKeyword" />
+      <scroll-view scroll-x class="chip-scroll" show-scrollbar="{{false}}">
+        <view class="chip-row">
+          <view class="chip {{catalogSheet.dealerId ? '' : 'on'}}" data-id="" bindtap="onCatalogDealer">全部</view>
+          <view class="chip {{catalogSheet.dealerId === 'dealer-meigu' ? 'on' : ''}}" data-id="dealer-meigu" bindtap="onCatalogDealer">美谷</view>
+          <view class="chip {{catalogSheet.dealerId === 'dealer-jinshan' ? 'on' : ''}}" data-id="dealer-jinshan" bindtap="onCatalogDealer">晋山</view>
+          <view class="chip {{catalogSheet.dealerId === 'dealer-vtlh' ? 'on' : ''}}" data-id="dealer-vtlh" bindtap="onCatalogDealer">维通利华</view>
+          <view class="chip {{catalogSheet.dealerId === 'dealer-heyuan' ? 'on' : ''}}" data-id="dealer-heyuan" bindtap="onCatalogDealer">和元</view>
+          <view class="chip {{catalogSheet.dealerId === 'dealer-senbeijia' ? 'on' : ''}}" data-id="dealer-senbeijia" bindtap="onCatalogDealer">森贝伽</view>
+          <view class="chip {{catalogSheet.dealerId === 'dealer-desite' ? 'on' : ''}}" data-id="dealer-desite" bindtap="onCatalogDealer">德思特</view>
+        </view>
+      </scroll-view>
+      <scroll-view scroll-y class="sheet-body">
+        <view class="pick-item" wx:for="{{catalogSheet.results}}" wx:key="id" data-id="{{item.id}}" bindtap="onPickCatalog">
+          <view>{{item.productName}}</view>
+          <view class="muted">{{item.spec}} · {{item.manufacturer}}</view>
+          <view class="dealer-pill">{{item.dealerShortName}}</view>
+          <text class="muted">{{item.dealerName}} · ¥{{item.unitPrice}}</text>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+</block>

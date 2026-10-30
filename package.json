@@ -1,0 +1,8 @@
+{
+  "name": "lab-reimburse-miniprogram",
+  "private": true,
+  "scripts": {
+    "test": "node scripts/validate.js",
+    "seed": "python3 scripts/build_seed.py"
+  }
+}

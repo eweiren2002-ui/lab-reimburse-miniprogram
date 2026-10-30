@@ -1,0 +1,30 @@
+<import src="/templates/detail.wxml" />
+<view wx:if="{{!ready}}" class="page"><view class="muted pad">加载中…</view></view>
+<view wx:elif="{{missing}}" class="page">
+  <view class="card">未找到该申请。如果刚刚恢复过演示数据，请返回列表重新进入。</view>
+</view>
+<block wx:else>
+  <template is="detailBody" data="{{app: app, showSavedInvoice: showSavedInvoice}}" />
+  <view class="page extra" wx:if="{{canInvoice}}">
+    <view class="card">
+      <view class="section-title">发票与报销备注</view>
+      <view class="muted">演示环境只保存文件名和说明，不会把发票上传到医院服务器。正式环境请改存微信云存储。</view>
+      <view class="field">
+        <textarea class="field-area" value="{{invoiceNote}}" maxlength="500" cursor-spacing="120" placeholder="发票号码、开票日期、报销说明" bindinput="onInvoiceNote" />
+      </view>
+      <view class="kv" wx:for="{{invoiceFiles}}" wx:key="key">
+        <text class="v">{{item.name}} · {{item.sizeText}}</text>
+        <text class="tool warn" data-index="{{index}}" bindtap="onRemoveInvoiceFile">移除</text>
+      </view>
+      <view class="sheet-actions">
+        <button class="btn" bindtap="onAddInvoiceFile">选择附件</button>
+        <button class="btn btn-primary" disabled="{{busy}}" bindtap="onSaveInvoice">保存发票备注</button>
+      </view>
+    </view>
+  </view>
+  <view class="footer-bar" wx:if="{{canEdit || canWithdraw || canGoApprove}}">
+    <button wx:if="{{canEdit}}" class="btn btn-primary" bindtap="onEdit">编辑</button>
+    <button wx:if="{{canWithdraw}}" class="btn" bindtap="onWithdraw">撤回</button>
+    <button wx:if="{{canGoApprove}}" class="btn btn-primary" bindtap="onGoApprove">去审批</button>
+  </view>
+</block>

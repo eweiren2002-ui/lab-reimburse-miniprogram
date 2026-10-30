@@ -1,0 +1,88 @@
+<template name="appCard">
+  <view class="card app-card" hover-class="card-hover" bindtap="onOpenCard" data-id="{{id}}">
+    <view class="between">
+      <text class="serial">{{serialNo}}</text>
+      <text class="status {{statusClass}}">{{statusText}}</text>
+    </view>
+    <view class="muted meta">{{dateText}} · {{applicantName}} · {{department}}</view>
+    <view class="reason-brief">{{reasonBrief}}</view>
+    <view class="fund" wx:if="{{fundNote}}">经费：{{fundNote}}</view>
+    <view class="dealer-row">
+      <text class="dealer-k">经销商</text>
+      <view class="dealer-pills">
+        <text class="dealer-pill" wx:for="{{dealerTags}}" wx:for-item="tag" wx:key="label">{{tag.label}}</text>
+      </view>
+    </view>
+    <view class="dealer-full muted" wx:if="{{dealerSummary}}">{{dealerSummary}}</view>
+    <view class="between foot">
+      <text class="muted">{{itemCount}} 项明细<text wx:if="{{hasInvoice}}"> · 已登记发票</text></text>
+      <text class="money">¥{{amountText}}</text>
+    </view>
+  </view>
+</template>
+
+<template name="applicationList">
+  <block wx:if="{{!vm || !vm.ready}}">
+    <view class="page"><view class="muted pad">加载中…</view></view>
+  </block>
+  <block wx:else>
+    <view class="page">
+      <view class="intro">{{vm.intro}}</view>
+      <view class="search-bar">
+        <input wx:if="{{searchBox}}" class="search-input" placeholder="搜索产品、经销商、单号、理由" bindinput="onKeyword" confirm-type="search" />
+        <view class="search-clear" wx:if="{{keyword}}" bindtap="onClearKeyword">清除</view>
+      </view>
+      <scroll-view scroll-x class="chip-scroll" show-scrollbar="{{false}}">
+        <view class="chip-row">
+          <view wx:for="{{vm.statusOptions}}" wx:key="text" class="chip {{vm.status === item.value ? 'on' : ''}}" data-value="{{item.value}}" bindtap="onStatus">{{item.text}}</view>
+        </view>
+      </scroll-view>
+      <scroll-view scroll-x class="chip-scroll" show-scrollbar="{{false}}">
+        <view class="chip-row">
+          <view class="chip {{vm.dealerId ? '' : 'on'}}" data-id="" bindtap="onDealer">全部经销商</view>
+          <view wx:for="{{vm.dealerOptions}}" wx:key="id" class="chip {{vm.dealerId === item.id ? 'on' : ''}}" data-id="{{item.id}}" bindtap="onDealer">{{item.shortName}} {{item.count}}</view>
+        </view>
+      </scroll-view>
+      <view class="seg">
+        <view class="seg-item {{vm.viewMode === 'sheet' ? 'on' : ''}}" data-mode="sheet" bindtap="onSwitchView">按申请单</view>
+        <view class="seg-item {{vm.viewMode === 'dealer' ? 'on' : ''}}" data-mode="dealer" bindtap="onSwitchView">按经销商</view>
+      </view>
+      <view class="create-row" wx:if="{{vm.role === 'applicant' && vm.mode === 'applicant'}}">
+        <button class="btn btn-primary btn-block" bindtap="onCreate">新建采购申请</button>
+      </view>
+
+      <block wx:if="{{vm.viewMode !== 'dealer'}}">
+        <view wx:if="{{!vm.cards.length}}" class="empty card">{{vm.emptyText}}</view>
+        <block wx:for="{{vm.cards}}" wx:key="id">
+          <template is="appCard" data="{{...item}}" />
+        </block>
+      </block>
+
+      <block wx:else>
+        <view wx:if="{{!vm.dealerGroups.length}}" class="empty card">当前筛选下没有经销商明细</view>
+        <view class="card dealer-group" wx:for="{{vm.dealerGroups}}" wx:key="dealerId">
+          <view class="group-head" bindtap="onToggleDealer" data-id="{{item.dealerId}}">
+            <view class="dealer-kicker">供货单位 / 经销商</view>
+            <view class="dealer-name">{{item.dealerName}}</view>
+            <view class="between">
+              <text class="dealer-pill">{{item.dealerShortName}}</text>
+              <text class="muted">{{item.open ? '收起' : '展开'}} · {{item.count}} 项 · {{item.appCount}} 单</text>
+            </view>
+            <view class="money">小计 ¥{{item.subtotalText}}</view>
+          </view>
+          <block wx:if="{{item.open}}">
+            <view class="line" wx:for="{{item.lines}}" wx:for-item="line" wx:key="key" bindtap="onOpenCard" data-id="{{line.appId}}">
+              <view class="kv"><text class="k">经销商</text><text class="v dealer-em">{{line.dealerName}}</text></view>
+              <view class="kv"><text class="k">产品名称</text><text class="v">{{line.sheetNo}} · {{line.productName}}</text></view>
+              <view class="kv"><text class="k">规格型号</text><text class="v">{{line.spec}}</text></view>
+              <view class="kv"><text class="k">生产单位</text><text class="v">{{line.manufacturer}}</text></view>
+              <view class="kv"><text class="k">采购量</text><text class="v">{{line.quantityText}} × ¥{{line.unitPriceText}}</text></view>
+              <view class="kv"><text class="k">总价（元）</text><text class="v money">{{line.totalPriceText}}</text></view>
+              <view class="kv"><text class="k">申请单</text><text class="v">{{line.serialNo}} · {{line.dateText}} · {{line.applicantName}}</text></view>
+            </view>
+          </block>
+        </view>
+      </block>
+    </view>
+  </block>
+</template>

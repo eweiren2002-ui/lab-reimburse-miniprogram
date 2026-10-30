@@ -1,0 +1,19 @@
+{
+  "pages": [
+    "pages/home/index",
+    "pages/apply/list",
+    "pages/apply/edit",
+    "pages/apply/detail",
+    "pages/approve/list",
+    "pages/approve/detail"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#0f5e57",
+    "navigationBarTitleText": "实验室采购",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f3f5f6",
+    "backgroundTextStyle": "dark"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

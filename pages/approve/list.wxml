@@ -1,0 +1,13 @@
+<import src="/templates/lists.wxml" />
+<block wx:if="{{blocked}}">
+  <view class="page">
+    <view class="card">
+      <view class="section-title">需要导师身份</view>
+      <view class="reason">当前是学生/申请人。审批请切换到导师（演示）。</view>
+      <button class="btn btn-primary" bindtap="onBecomeMentor">切换为导师并继续</button>
+    </view>
+  </view>
+</block>
+<block wx:else>
+  <template is="applicationList" data="{{vm: vm, keyword: keyword, searchBox: searchBox}}" />
+</block>

@@ -1,0 +1,26 @@
+<import src="/templates/detail.wxml" />
+<view wx:if="{{!ready}}" class="page"><view class="muted pad">加载中…</view></view>
+<view wx:elif="{{blocked}}" class="page">
+  <view class="card">
+    <view class="section-title">需要导师身份</view>
+    <view class="reason">审批通过、驳回只在导师身份下进行。</view>
+    <button class="btn btn-primary" bindtap="onBecomeMentor">切换为导师并继续</button>
+  </view>
+</view>
+<view wx:elif="{{missing}}" class="page">
+  <view class="card">未找到该申请。如果刚刚恢复过演示数据，请返回列表重新进入。</view>
+</view>
+<block wx:else>
+  <template is="detailBody" data="{{app: app, showSavedInvoice: showSavedInvoice}}" />
+  <view class="page extra" wx:if="{{canDecide}}">
+    <view class="card">
+      <view class="section-title">审批意见</view>
+      <view class="muted">驳回时必须填写意见。通过时建议写明经费口径。</view>
+      <textarea class="field-area" value="{{comment}}" maxlength="300" cursor-spacing="140" placeholder="请填写审批意见" bindinput="onComment" />
+    </view>
+  </view>
+  <view class="footer-bar" wx:if="{{canDecide}}">
+    <button class="btn btn-danger" disabled="{{busy}}" bindtap="onReject">驳回</button>
+    <button class="btn btn-primary" disabled="{{busy}}" bindtap="onApprove">通过</button>
+  </view>
+</block>

@@ -1,0 +1,7 @@
+.home-actions {
+  margin-top: 8rpx;
+}
+
+.pending-amount {
+  margin: 8rpx 0 20rpx;
+}
